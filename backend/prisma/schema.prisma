@@ -1,0 +1,288 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum LostItemStatus {
+  ACTIVE
+  MATCHED
+  FOUND
+  CLOSED
+}
+
+enum FoundItemStatus {
+  ACTIVE
+  CLAIM_PENDING
+  CLAIMED
+  RETURNED
+  CLOSED
+}
+
+enum ClaimStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum HandoverStatus {
+  PENDING
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum MatchStatus {
+  POTENTIAL
+  REVIEWED
+  CONFIRMED
+  DISMISSED
+}
+
+enum NotificationType {
+  MATCH
+  CLAIM
+  VERIFICATION
+  HANDOVER
+  SYSTEM
+}
+
+model User {
+  id           String   @id @default(uuid())
+  collegeEmail String   @unique
+  role         Role     @default(STUDENT)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  lostItems     LostItem[]
+  foundItems    FoundItem[]
+  claims        Claim[]        @relation("ClaimantUser")
+  notifications Notification[]
+  adminActions  AdminAction[]
+
+  @@index([collegeEmail])
+}
+
+model OTP {
+  id        String    @id @default(uuid())
+  email     String
+  hashedOtp String
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+  @@index([email, usedAt, expiresAt])
+}
+
+model LostItem {
+  id          String         @id @default(uuid())
+  userId      String
+  title       String
+  category    String
+  description String
+  location    String
+  lostDate    DateTime
+  status      LostItemStatus @default(ACTIVE)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images  ItemImage[]
+  matches Match[]
+  claims  Claim[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@index([lostDate])
+  @@index([category, status])
+}
+
+model FoundItem {
+  id          String          @id @default(uuid())
+  finderId    String
+  title       String
+  category    String
+  description String
+  location    String
+  foundDate   DateTime
+  status      FoundItemStatus @default(ACTIVE)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  finder                User                   @relation(fields: [finderId], references: [id], onDelete: Cascade)
+  images                ItemImage[]
+  matches               Match[]
+  claims                Claim[]
+  verificationQuestions VerificationQuestion[]
+
+  @@index([finderId])
+  @@index([status])
+  @@index([category])
+  @@index([foundDate])
+  @@index([category, status])
+}
+
+model ItemImage {
+  id          String   @id @default(uuid())
+  imageUrl    String
+  isPrivate   Boolean  @default(true)
+  lostItemId  String?
+  foundItemId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lostItem  LostItem?  @relation(fields: [lostItemId], references: [id], onDelete: Cascade)
+  foundItem FoundItem? @relation(fields: [foundItemId], references: [id], onDelete: Cascade)
+
+  @@index([lostItemId])
+  @@index([foundItemId])
+}
+
+model Match {
+  id            String      @id @default(uuid())
+  lostItemId    String
+  foundItemId   String
+  textScore     Float?
+  imageScore    Float?
+  metadataScore Float?
+  overallScore  Float?
+  status        MatchStatus @default(POTENTIAL)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  lostItem  LostItem  @relation(fields: [lostItemId], references: [id], onDelete: Restrict)
+  foundItem FoundItem @relation(fields: [foundItemId], references: [id], onDelete: Restrict)
+  claims    Claim[]
+
+  @@unique([lostItemId, foundItemId])
+  @@index([lostItemId])
+  @@index([foundItemId])
+  @@index([status])
+  @@index([overallScore])
+}
+
+model Claim {
+  id          String      @id @default(uuid())
+  claimantId  String
+  foundItemId String
+  lostItemId  String?
+  matchId     String?
+  status      ClaimStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  claimant             User                  @relation("ClaimantUser", fields: [claimantId], references: [id], onDelete: Restrict)
+  foundItem            FoundItem             @relation(fields: [foundItemId], references: [id], onDelete: Restrict)
+  lostItem             LostItem?             @relation(fields: [lostItemId], references: [id], onDelete: SetNull)
+  match                Match?                @relation(fields: [matchId], references: [id], onDelete: SetNull)
+  verificationAttempts VerificationAttempt[]
+  handover             Handover?
+
+  @@index([claimantId])
+  @@index([foundItemId])
+  @@index([lostItemId])
+  @@index([matchId])
+  @@index([status])
+}
+
+model VerificationQuestion {
+  id             String   @id @default(uuid())
+  foundItemId    String
+  questionText   String
+  expectedAnswer String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  foundItem           FoundItem            @relation(fields: [foundItemId], references: [id], onDelete: Cascade)
+  verificationAnswers VerificationAnswer[]
+
+  @@index([foundItemId])
+}
+
+model VerificationAttempt {
+  id            String   @id @default(uuid())
+  claimId       String
+  attemptNumber Int      @default(1)
+  status        String   @default("SUBMITTED")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  claim   Claim                @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  answers VerificationAnswer[]
+
+  @@index([claimId])
+}
+
+model VerificationAnswer {
+  id              String   @id @default(uuid())
+  attemptId       String
+  questionId      String
+  submittedAnswer String
+  isCorrect       Boolean?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  attempt  VerificationAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question VerificationQuestion @relation(fields: [questionId], references: [id], onDelete: Restrict)
+
+  @@index([attemptId])
+  @@index([questionId])
+}
+
+model Handover {
+  id          String         @id @default(uuid())
+  claimId     String         @unique
+  status      HandoverStatus @default(PENDING)
+  scheduledAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  claim Claim @relation(fields: [claimId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isRead])
+}
+
+model AdminAction {
+  id         String   @id @default(uuid())
+  adminId    String
+  action     String
+  targetType String
+  targetId   String
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  admin User @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@index([adminId])
+  @@index([targetType, targetId])
+}
