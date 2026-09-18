@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import nodemailer, { Transporter } from 'nodemailer';
 import { config } from '../config';
 
 export interface SendOtpParams {
@@ -11,7 +11,7 @@ export interface SendOtpParams {
 const devOtpMemoryStore = new Map<string, string>();
 
 export class EmailService {
-  private transporter: nodemailer.Transporter | null = null;
+  private transporter: Transporter | null = null;
 
   constructor() {
     if (config.emailMode === 'smtp' && config.smtpHost) {

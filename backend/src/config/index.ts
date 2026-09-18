@@ -23,6 +23,11 @@ export const config = {
   smtpUser: process.env.SMTP_USER || '',
   smtpPassword: process.env.SMTP_PASSWORD || '',
   emailFrom: process.env.EMAIL_FROM || 'no-reply@campusfind.edu',
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
+  maxImagesPerItem: parseInt(process.env.MAX_IMAGES_PER_ITEM || '5', 10),
+  maxImageSizeBytes: parseInt(process.env.MAX_IMAGE_SIZE_BYTES || '5242880', 10), // 5 MB
 };
 
 // Simple configuration sanity check
