@@ -22,7 +22,7 @@ graph TD
 - **Database**: A relational **PostgreSQL** database accessed via **Prisma ORM**.
 - **Third-Party Services**:
   - **Cloudinary**: Object storage for secure uploading and delivery of lost and found item images.
-  - **Resend**: Transactional email service for OTP delivery and system notifications.
+  - **SMTP/Nodemailer**: Transactional email delivery for OTP messages. Development mode logs locally only; production delivery requires configured SMTP credentials.
 
 ---
 

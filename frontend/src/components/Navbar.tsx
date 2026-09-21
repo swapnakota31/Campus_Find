@@ -15,6 +15,7 @@ export function Navbar() {
     { href: '/lost', label: 'Lost Items' },
     { href: '/found', label: 'Found Items' },
     { href: '/my-reports', label: 'My Reports' },
+    { href: '/notifications', label: 'Notifications' },
   ];
 
   const isActive = (path: string) => {

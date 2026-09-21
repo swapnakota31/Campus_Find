@@ -246,6 +246,8 @@ model Handover {
   id          String         @id @default(uuid())
   claimId     String         @unique
   status      HandoverStatus @default(PENDING)
+  finderConfirmed   Boolean   @default(false)
+  claimantConfirmed Boolean   @default(false)
   scheduledAt DateTime?
   completedAt DateTime?
   createdAt   DateTime       @default(now())

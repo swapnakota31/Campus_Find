@@ -20,6 +20,27 @@ export const getClaim = async (req: Request, res: Response, next: NextFunction):
   } catch (error) { next(error); }
 };
 
+export const listFoundItemClaims = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const data = await claimService.listClaimsForFoundItem(req.params.foundItemId, req.user!.userId, req.user!.role);
+    res.status(200).json({ status: 'success', data });
+  } catch (error) { next(error); }
+};
+
+export const approveFinderClaim = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const data = await claimService.decideClaimAsFinder(req.params.id, req.user!.userId, 'APPROVE', req.body?.reason);
+    res.status(200).json({ status: 'success', data });
+  } catch (error) { next(error); }
+};
+
+export const rejectFinderClaim = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const data = await claimService.decideClaimAsFinder(req.params.id, req.user!.userId, 'REJECT', req.body?.reason);
+    res.status(200).json({ status: 'success', data });
+  } catch (error) { next(error); }
+};
+
 export const cancelClaim = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     res.status(200).json({ status: 'success', data: await claimService.cancelClaim(req.params.id, req.user!.userId) });

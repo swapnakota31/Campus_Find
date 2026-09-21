@@ -111,6 +111,40 @@ export interface FoundItem {
   images?: ItemImage[];
 }
 
+export interface Notification {
+  id: string;
+  type: 'MATCH' | 'CLAIM' | 'VERIFICATION' | 'HANDOVER' | 'SYSTEM';
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface Claim {
+  id: string;
+  claimantId: string;
+  foundItemId: string;
+  lostItemId: string | null;
+  matchId: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  handover: {
+    id: string;
+    status: string;
+    finderConfirmed: boolean;
+    claimantConfirmed: boolean;
+    completedAt: string | null;
+  } | null;
+  foundItem: Pick<FoundItem, 'id' | 'title' | 'category' | 'description' | 'location' | 'foundDate' | 'status'>;
+}
+
+export interface ClaimQuestion {
+  id: string;
+  questionText: string;
+  createdAt: string;
+}
+
 export type MatchStatus = 'POTENTIAL' | 'REVIEWED' | 'CONFIRMED' | 'DISMISSED';
 
 export interface AdminMatch {
@@ -137,6 +171,12 @@ export interface AdminMatchImage {
 export interface AdminMatchDetail extends Omit<AdminMatch, 'lostItem' | 'foundItem'> {
   lostItem: LostItem & { images: AdminMatchImage[] };
   foundItem: FoundItem & { images: AdminMatchImage[] };
+  claims: Array<{
+    id: string;
+    status: string;
+    createdAt: string;
+    handover: { id: string; status: string; completedAt: string | null } | null;
+  }>;
 }
 
 export interface GetItemsQuery {
@@ -367,4 +407,45 @@ export const api = {
   rejectAdminMatch: async (id: string, reason: string): Promise<{ status: string; data: AdminMatch }> => {
     return api.post(`/admin/matches/${id}/reject`, { reason });
   },
+
+  confirmAdminHandover: async (claimId: string): Promise<{ status: string; data: {
+    claimId: string;
+    claimStatus: string;
+    handover: { id: string; claimId: string; status: string; completedAt: string | null };
+    foundItem: { id: string; status: FoundItemStatus };
+    lostItem: { id: string; status: LostItemStatus } | null;
+  } }> => {
+    return api.post(`/admin/claims/${claimId}/handover`);
+  },
+
+  // Student workflow endpoints
+  createClaim: async (foundItemId: string, lostItemId?: string): Promise<{ status: string; data: Claim }> => {
+    return api.post('/claims', { foundItemId, ...(lostItemId ? { lostItemId } : {}) });
+  },
+
+  getMyClaims: async (): Promise<{ status: string; data: Claim[] }> => api.get('/claims/my'),
+
+  getClaim: async (id: string): Promise<{ status: string; data: Claim }> => api.get(`/claims/${id}`),
+
+  getClaimQuestions: async (id: string): Promise<{ status: string; data: ClaimQuestion[] }> => api.get(`/claims/${id}/verification-questions`),
+
+  verifyClaim: async (id: string, answers: Array<{ questionId: string; answer: string }>): Promise<{ status: string; data: { verified: boolean; status: string } }> => api.post(`/claims/${id}/verify`, { answers }),
+
+  cancelClaim: async (id: string): Promise<{ status: string; data: Claim }> => api.post(`/claims/${id}/cancel`),
+
+  getFoundItemClaims: async (foundItemId: string): Promise<{ status: string; data: Claim[] }> => api.get(`/claims/found/${foundItemId}`),
+
+  approveFinderClaim: async (id: string): Promise<{ status: string; data: Claim }> => api.post(`/claims/${id}/finder-approve`),
+
+  rejectFinderClaim: async (id: string, reason: string): Promise<{ status: string; data: Claim }> => api.post(`/claims/${id}/finder-reject`, { reason }),
+
+  confirmFinderHandover: async (claimId: string): Promise<{ status: string; data: any }> => api.post(`/claims/${claimId}/finder-confirm`),
+
+  confirmClaimantReceipt: async (claimId: string): Promise<{ status: string; data: any }> => api.post(`/claims/${claimId}/receipt-confirm`),
+
+  getNotifications: async (): Promise<{ status: string; data: Notification[] }> => api.get('/notifications'),
+
+  markNotificationRead: async (id: string): Promise<{ status: string; data: { id: string; isRead: boolean } }> => api.post(`/notifications/${id}/read`),
+
+  markAllNotificationsRead: async (): Promise<{ status: string; data: { updated: boolean } }> => api.post('/notifications/read-all'),
 };

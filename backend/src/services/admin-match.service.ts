@@ -112,6 +112,16 @@ export class AdminMatchService {
             },
           },
         },
+        claims: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          select: {
+            id: true,
+            status: true,
+            createdAt: true,
+            handover: { select: { id: true, status: true, completedAt: true } },
+          },
+        },
       },
     });
 
@@ -135,6 +145,7 @@ export class AdminMatchService {
           createdAt: image.createdAt,
         })),
       },
+      claims: match.claims,
     };
   }
 

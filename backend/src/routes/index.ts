@@ -7,6 +7,8 @@ import imageRoutes from './image.routes';
 import { adminRouter, claimsRouter, questionRouter } from './claim.routes';
 import matchingRoutes from './matching.routes';
 import adminMatchRoutes from './admin-match.routes';
+import handoverRoutes, { participantRouter } from './handover.routes';
+import notificationRoutes from './notification.routes';
 
 const router = Router();
 
@@ -56,6 +58,12 @@ router.use('/matching', matchingRoutes);
 router.use('/v1/matching', matchingRoutes);
 router.use('/admin/matches', adminMatchRoutes);
 router.use('/v1/admin/matches', adminMatchRoutes);
+router.use('/admin/claims', handoverRoutes);
+router.use('/v1/admin/claims', handoverRoutes);
+router.use('/claims', participantRouter);
+router.use('/v1/claims', participantRouter);
+router.use('/notifications', notificationRoutes);
+router.use('/v1/notifications', notificationRoutes);
 
 export default router;
 

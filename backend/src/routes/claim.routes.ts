@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Role } from '@prisma/client';
 import {
   approveClaim,
+  approveFinderClaim,
   cancelClaim,
   createClaim,
   createVerificationQuestion,
@@ -9,9 +10,11 @@ import {
   getClaimQuestions,
   getAdminClaim as getAdminClaimHandler,
   listAdminClaims,
+  listFoundItemClaims,
   listMyClaims,
   listVerificationQuestions,
   rejectClaim,
+  rejectFinderClaim,
   verifyClaim,
 } from '../controllers/claim.controller';
 import { authenticateUser, requireRole } from '../middleware/auth.middleware';
@@ -20,9 +23,12 @@ const claimsRouter = Router();
 claimsRouter.use(authenticateUser);
 claimsRouter.post('/', requireRole(Role.STUDENT), createClaim);
 claimsRouter.get('/my', requireRole(Role.STUDENT), listMyClaims);
+claimsRouter.get('/found/:foundItemId', listFoundItemClaims);
 claimsRouter.get('/:id/verification-questions', getClaimQuestions);
 claimsRouter.post('/:id/verify', requireRole(Role.STUDENT), verifyClaim);
 claimsRouter.post('/:id/cancel', requireRole(Role.STUDENT), cancelClaim);
+claimsRouter.post('/:id/finder-approve', requireRole(Role.STUDENT), approveFinderClaim);
+claimsRouter.post('/:id/finder-reject', requireRole(Role.STUDENT), rejectFinderClaim);
 claimsRouter.get('/:id', getClaim);
 
 const questionRouter = Router();

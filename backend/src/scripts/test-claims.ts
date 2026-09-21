@@ -157,6 +157,8 @@ async function runClaimTests() {
     assert(adminClaim.verificationAttempts[0].answers[0].isCorrect === true && !('submittedAnswerHash' in adminClaim.verificationAttempts[0].answers[0]), 'Admin review exposes outcomes without raw answers');
     const decision = await claimService.decideClaim(claim.id, adminId, 'APPROVE', 'Verification reviewed by admin.');
     assert(decision.status === ClaimStatus.APPROVED, 'Admin can approve a claim');
+    const pendingHandover = await prisma.handover.findUnique({ where: { claimId: claim.id } });
+    assert(pendingHandover?.status === 'PENDING', 'Approved claim creates a pending handover record');
     const audit = await prisma.adminAction.findFirst({ where: { adminId, targetId: claim.id } });
     assert(!!audit, 'Admin approval creates an audit record');
     const notificationCount = await prisma.notification.count({ where: { userId: claimantId, type: 'CLAIM' } });
@@ -171,6 +173,7 @@ async function runClaimTests() {
   } finally {
     if (claimIds.length > 0) {
       await prisma.adminAction.deleteMany({ where: { targetId: { in: claimIds } } });
+      await prisma.handover.deleteMany({ where: { claimId: { in: claimIds } } });
       await prisma.claim.deleteMany({ where: { id: { in: claimIds } } });
     }
     if (foundItemId) await prisma.foundItem.delete({ where: { id: foundItemId } }).catch(() => undefined);

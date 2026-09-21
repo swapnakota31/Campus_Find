@@ -39,6 +39,9 @@ const publicClaimSelect = {
   status: true,
   createdAt: true,
   updatedAt: true,
+  handover: {
+    select: { id: true, status: true, finderConfirmed: true, claimantConfirmed: true, completedAt: true },
+  },
   foundItem: {
     select: {
       id: true,
@@ -227,6 +230,38 @@ export class ClaimService {
 
     const { finderId: _finderId, ...safeFoundItem } = claim.foundItem;
     return { ...claim, foundItem: safeFoundItem };
+  }
+
+  async listClaimsForFoundItem(foundItemId: string, requestingUserId: string, role: Role) {
+    const foundItem = await prisma.foundItem.findUnique({
+      where: { id: foundItemId },
+      select: { finderId: true },
+    });
+    if (!foundItem) throw new AppError('Found item report not found.', 404);
+    if (role !== Role.ADMIN && foundItem.finderId !== requestingUserId) {
+      throw new AppError('Forbidden: only the finder or an admin can view these claims.', 403);
+    }
+    return prisma.claim.findMany({
+      where: { foundItemId },
+      orderBy: { createdAt: 'desc' },
+      select: publicClaimSelect,
+    });
+  }
+
+  async decideClaimAsFinder(claimId: string, finderId: string, decision: 'APPROVE' | 'REJECT', reason?: unknown) {
+    const claim = await prisma.claim.findUnique({
+      where: { id: claimId },
+      select: { foundItemId: true },
+    });
+    if (!claim) throw new AppError('Claim not found.', 404);
+    const foundItem = await prisma.foundItem.findUnique({
+      where: { id: claim.foundItemId },
+      select: { finderId: true },
+    });
+    if (!foundItem || foundItem.finderId !== finderId) {
+      throw new AppError('Forbidden: only the finder can decide this claim.', 403);
+    }
+    return this.decideClaim(claimId, finderId, decision, reason, false);
   }
 
   async cancelClaim(claimId: string, claimantId: string) {
@@ -431,7 +466,7 @@ export class ClaimService {
     return claim;
   }
 
-  async decideClaim(claimId: string, adminId: string, decision: 'APPROVE' | 'REJECT', reason?: unknown) {
+  async decideClaim(claimId: string, actorId: string, decision: 'APPROVE' | 'REJECT', reason?: unknown, isAdmin = true) {
     if (decision === 'REJECT' && (typeof reason !== 'string' || reason.trim().length < 3)) {
       throw new AppError('A rejection reason is required.', 400);
     }
@@ -451,15 +486,24 @@ export class ClaimService {
         data: { status },
         select: { id: true, status: true },
       });
-      await transaction.adminAction.create({
-        data: {
-          adminId,
-          action: `${decision}_CLAIM`,
-          targetType: 'Claim',
-          targetId: claimId,
-          reason: typeof reason === 'string' ? reason.trim() : undefined,
-        },
-      });
+      if (decision === 'APPROVE') {
+        await transaction.handover.upsert({
+          where: { claimId },
+          create: { claimId, status: 'PENDING' },
+          update: {},
+        });
+      }
+      if (isAdmin) {
+        await transaction.adminAction.create({
+          data: {
+            adminId: actorId,
+            action: `${decision}_CLAIM`,
+            targetType: 'Claim',
+            targetId: claimId,
+            reason: typeof reason === 'string' ? reason.trim() : undefined,
+          },
+        });
+      }
       await transaction.notification.create({
         data: {
           userId: claim.claimantId,
@@ -470,6 +514,18 @@ export class ClaimService {
             : 'Your claim was rejected by an administrator.',
         },
       });
+      if (!isAdmin) {
+        if (decision === 'APPROVE') {
+          await transaction.notification.create({
+            data: {
+              userId: claim.claimantId,
+              type: NotificationType.HANDOVER,
+              title: 'Handover can proceed',
+              message: 'The finder approved your claim. Handover confirmation is now available.',
+            },
+          });
+        }
+      }
       return updated;
     });
   }

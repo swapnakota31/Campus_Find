@@ -15,7 +15,10 @@
     "test:verification-security": "ts-node src/scripts/test-verification-security.ts",
     "test:claims": "ts-node src/scripts/test-claims.ts",
     "test:matching": "ts-node src/scripts/test-matching.ts",
-    "test:admin-matches": "ts-node src/scripts/test-admin-matches.ts"
+    "test:admin-matches": "ts-node src/scripts/test-admin-matches.ts",
+    "test:handover": "ts-node src/scripts/test-handover.ts"
+    ,"test:student-workflow": "ts-node src/scripts/test-student-workflow.ts",
+    "test:participant-handover": "ts-node src/scripts/test-participant-handover.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",

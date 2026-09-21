@@ -1,5 +1,6 @@
 import nodemailer, { Transporter } from 'nodemailer';
 import { config } from '../config';
+import { AppError } from '../utils/errors';
 
 export interface SendOtpParams {
   email: string;
@@ -38,7 +39,7 @@ export class EmailService {
     // Store in dev memory store for automated testing and dev verification
     devOtpMemoryStore.set(normalizedEmail, otp);
 
-    if (config.emailMode === 'dev' || !this.transporter) {
+    if (config.emailMode === 'dev') {
       console.log(`
 ======================================================
 [DEV EMAIL SERVICE] OTP Dispatch Notice
@@ -48,6 +49,17 @@ Expires In: ${expiresInMinutes} minutes
 ======================================================
       `);
       return;
+    }
+
+    if (config.emailMode !== 'smtp') {
+      throw new AppError(`Unsupported EMAIL_MODE '${config.emailMode}'. Use 'smtp' or 'dev'.`, 500);
+    }
+
+    if (!this.transporter) {
+      throw new AppError(
+        'SMTP email delivery is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, and EMAIL_FROM.',
+        500
+      );
     }
 
     // SMTP Mode Execution

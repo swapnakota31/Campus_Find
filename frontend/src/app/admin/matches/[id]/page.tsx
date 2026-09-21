@@ -50,6 +50,8 @@ export default function AdminMatchDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [decision, setDecision] = useState<'APPROVE' | 'REJECT' | null>(null);
+  const [handoverOpen, setHandoverOpen] = useState(false);
+  const [handoverLoading, setHandoverLoading] = useState(false);
   const [decisionLoading, setDecisionLoading] = useState(false);
 
   const loadMatch = async () => {
@@ -100,6 +102,21 @@ export default function AdminMatchDetailPage() {
     }
   };
 
+  const confirmHandover = async () => {
+    const claim = match?.claims[0];
+    if (!claim) return;
+    setHandoverLoading(true);
+    try {
+      await api.confirmAdminHandover(claim.id);
+      setHandoverOpen(false);
+      await loadMatch();
+    } catch (requestError: any) {
+      setError(requestError.message || 'Unable to confirm handover.');
+    } finally {
+      setHandoverLoading(false);
+    }
+  };
+
   if (authLoading || loading) return <LoadingState message="Loading match review..." />;
   if (user?.role !== 'ADMIN') return null;
   if (error && !match) return <><Navbar /><ErrorState message={error} onRetry={loadMatch} /></>;
@@ -137,9 +154,11 @@ export default function AdminMatchDetailPage() {
             ].map(([label, value]) => <div key={label as string} className="rounded-xl border border-slate-800 bg-slate-950 p-4"><p className="text-xs text-slate-500">{label as string}</p><p className="text-xl font-mono font-bold text-blue-300 mt-2">{score(value as number | null)}</p></div>)}
           </div>
           {isPotential && <div className="flex flex-col sm:flex-row justify-end gap-3 border-t border-slate-800 pt-5"><button onClick={() => setDecision('REJECT')} className="rounded-xl border border-rose-500/30 px-4 py-2.5 text-sm font-semibold text-rose-300 hover:bg-rose-500/10">Reject match</button><button onClick={() => setDecision('APPROVE')} className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500">Approve match</button></div>}
+          {match.claims[0] && <div className="border-t border-slate-800 pt-5 space-y-3"><div className="flex flex-wrap items-center gap-3 text-xs text-slate-400"><span>Claim status: <strong className="text-slate-200">{match.claims[0].status}</strong></span><span>Handover: <strong className="text-slate-200">{match.claims[0].handover?.status || 'PENDING'}</strong></span></div>{match.claims[0].status === 'APPROVED' && match.claims[0].handover?.status !== 'COMPLETED' && <button onClick={() => setHandoverOpen(true)} className="rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-amber-400">Confirm Handover</button>}{match.claims[0].handover?.status === 'COMPLETED' && <p className="text-sm font-semibold text-emerald-300">Handover completed. Item marked returned.</p>}</div>}
         </section>
       </main>
       <ConfirmDialog isOpen={decision !== null} title={`${decision === 'APPROVE' ? 'Approve' : 'Reject'} this match?`} message="This records an administrator decision on the similarity match. It will not approve ownership, create a claim, or complete a handover." confirmLabel={decision === 'APPROVE' ? 'Approve match' : 'Reject match'} cancelLabel="Keep reviewing" isDangerous={decision === 'REJECT'} loading={decisionLoading} onConfirm={decide} onCancel={() => setDecision(null)} />
+      <ConfirmDialog isOpen={handoverOpen} title="Confirm physical handover?" message="Only confirm after the item has actually been handed over. This will mark the related found item as returned and preserve the audit history." confirmLabel="Confirm Handover" cancelLabel="Keep reviewing" isDangerous={false} loading={handoverLoading} onConfirm={confirmHandover} onCancel={() => setHandoverOpen(false)} />
     </div>
   );
 }
