@@ -47,7 +47,7 @@ export class AuthService {
   /**
    * Initiates OTP request flow for college email authentication.
    */
-  public async requestOTP(rawEmail: string): Promise<{ message: string; devOtp?: string }> {
+  public async requestOTP(rawEmail: string): Promise<{ message: string }> {
     const email = this.validateEmailDomain(rawEmail);
 
     // Cooldown check to prevent spamming OTP requests
@@ -96,10 +96,8 @@ export class AuthService {
       expiresInMinutes: config.otpExpiryMinutes,
     });
 
-    const isDev = config.emailMode === 'dev';
     return {
       message: 'Verification code sent to email.',
-      ...(isDev && { devOtp: otp }),
     };
   }
 

@@ -88,6 +88,15 @@ async function runItemTests() {
     const user1HasItem = myLostItems.items.some((i) => i.id === createdLost.id);
     assert(user1HasItem, '5. User retrieval of their own lost reports (myItems=true)');
 
+    const otherUserLostDetail = await lostItemService.getLostItemById(createdLost.id, user2.id);
+    assert(
+      !('images' in otherUserLostDetail) &&
+        !('privateDetails' in otherUserLostDetail) &&
+        !('matches' in otherUserLostDetail) &&
+        !('claims' in otherUserLostDetail),
+      'Lost item detail omits private information for other users'
+    );
+
     // 6. User cannot modify another user's lost report
     let modifyBlocked = false;
     try {
@@ -165,6 +174,15 @@ async function runItemTests() {
     assert(
       !!publicItem && !hasFinderEmail,
       '12. Privacy rule enforcement: Found item listing strictly omits finder email/private info'
+    );
+
+    const otherUserFoundDetail = await foundItemService.getFoundItemById(createdFound.id, user2.id);
+    assert(
+      !('finderId' in otherUserFoundDetail) &&
+        !('images' in otherUserFoundDetail) &&
+        !('verificationQuestions' in otherUserFoundDetail) &&
+        !('claims' in otherUserFoundDetail),
+      'Found item detail omits private information for other users'
     );
 
     // 13. User cannot modify another user's found report

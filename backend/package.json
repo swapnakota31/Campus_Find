@@ -11,7 +11,8 @@
     "test-db": "ts-node src/scripts/test-db-connection.ts",
     "test:auth": "ts-node src/scripts/test-auth.ts",
     "test:items": "ts-node src/scripts/test-items.ts",
-    "test:images": "ts-node src/scripts/test-images.ts"
+    "test:images": "ts-node src/scripts/test-images.ts",
+    "test:verification-security": "ts-node src/scripts/test-verification-security.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",

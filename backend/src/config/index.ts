@@ -11,7 +11,10 @@ export const config = {
   allowedEmailDomains: (process.env.ALLOWED_EMAIL_DOMAINS || 'gecgudlavallerumic.in')
     .split(',')
     .map(domain => domain.trim().toLowerCase()),
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:3000,http://127.0.0.1:3000')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean),
   jwtSecret: process.env.JWT_SECRET || 'campusfind-dev-jwt-secret-key-change-in-prod',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   otpExpiryMinutes: parseInt(process.env.OTP_EXPIRY_MINUTES || '10', 10),

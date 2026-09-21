@@ -211,7 +211,7 @@ export const api = {
   },
 
   // Auth endpoints
-  requestOTP: async (email: string): Promise<{ status: string; message: string; devOtp?: string }> => {
+  requestOTP: async (email: string): Promise<{ status: string; message: string }> => {
     return api.post('/auth/request-otp', { email });
   },
 

@@ -14,11 +14,10 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, or same-origin)
       if (!origin) return callback(null, true);
-      const allowedOrigins = [config.corsOrigin, 'http://localhost:3000', 'http://127.0.0.1:3000'];
-      if (allowedOrigins.includes(origin)) {
+      if (config.corsOrigins.includes(origin)) {
         return callback(null, true);
       }
-      return callback(null, true); // Permissive in dev mode for local testing
+      return callback(new AppError('Origin is not allowed by CORS policy.', 403));
     },
     credentials: true,
   })

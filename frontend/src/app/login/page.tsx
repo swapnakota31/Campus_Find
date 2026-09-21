@@ -13,7 +13,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [devOtpHint, setDevOtpHint] = useState<string | null>(null);
 
   const { user, refreshUser } = useAuth();
   const router = useRouter();
@@ -28,7 +27,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
-    setDevOtpHint(null);
 
     if (!email) {
       setError('Please enter your college email address.');
@@ -39,9 +37,6 @@ export default function LoginPage() {
       setLoading(true);
       const res = await api.requestOTP(email);
       setSuccessMessage(res.message || 'Verification code sent to your email.');
-      if (res.devOtp) {
-        setDevOtpHint(res.devOtp);
-      }
       setStep('OTP');
     } catch (err: any) {
       console.error(err);
@@ -104,13 +99,6 @@ export default function LoginPage() {
           <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs rounded-xl p-3.5 flex items-start gap-2">
             <span className="font-bold text-emerald-400">Success:</span>
             <span>{successMessage}</span>
-          </div>
-        )}
-
-        {devOtpHint && (
-          <div className="bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs rounded-xl p-4 font-mono space-y-1">
-            <div className="font-bold text-amber-400 text-[11px] uppercase tracking-wider">[DEV MODE] Generated OTP Code</div>
-            <div className="text-2xl font-bold tracking-widest text-amber-200">{devOtpHint}</div>
           </div>
         )}
 

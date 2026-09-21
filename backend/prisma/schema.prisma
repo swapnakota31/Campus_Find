@@ -202,7 +202,7 @@ model VerificationQuestion {
   id             String   @id @default(uuid())
   foundItemId    String
   questionText   String
-  expectedAnswer String
+  expectedAnswerHash String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -230,7 +230,7 @@ model VerificationAnswer {
   id              String   @id @default(uuid())
   attemptId       String
   questionId      String
-  submittedAnswer String
+  submittedAnswerHash String
   isCorrect       Boolean?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

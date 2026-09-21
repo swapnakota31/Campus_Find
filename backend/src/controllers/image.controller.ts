@@ -3,6 +3,7 @@ import { prisma } from '../utils/prisma';
 import { AppError } from '../utils/errors';
 import { config } from '../config';
 import { imageService } from '../services/image.service';
+import { canAccessPrivateItemImages } from '../utils/image-access';
 
 /**
  * POST /api/items/lost/:id/images - Upload private image for Lost Item
@@ -27,7 +28,7 @@ export const uploadLostItemImage = async (req: Request, res: Response, next: Nex
     }
 
     // Ownership check
-    if (lostItem.userId !== userId) {
+    if (!canAccessPrivateItemImages(userId, lostItem.userId, req.user!.role)) {
       res.status(403).json({ success: false, message: 'Forbidden: You are not authorized to upload images for this report.' });
       return;
     }
@@ -99,7 +100,7 @@ export const uploadFoundItemImage = async (req: Request, res: Response, next: Ne
     }
 
     // Finder ownership check
-    if (foundItem.finderId !== userId) {
+    if (!canAccessPrivateItemImages(userId, foundItem.finderId, req.user!.role)) {
       res.status(403).json({ success: false, message: 'Forbidden: You are not authorized to upload images for this report.' });
       return;
     }
@@ -166,7 +167,7 @@ export const getLostItemImages = async (req: Request, res: Response, next: NextF
     }
 
     // Ownership Privacy Check: Only owner can view private images
-    if (lostItem.userId !== userId) {
+    if (!canAccessPrivateItemImages(userId, lostItem.userId, req.user!.role)) {
       res.status(403).json({ success: false, message: 'Forbidden: Private images are restricted to the report owner.' });
       return;
     }
@@ -211,7 +212,7 @@ export const getFoundItemImages = async (req: Request, res: Response, next: Next
     }
 
     // Finder Privacy Check: Only finder can view private images
-    if (foundItem.finderId !== userId) {
+    if (!canAccessPrivateItemImages(userId, foundItem.finderId, req.user!.role)) {
       res.status(403).json({ success: false, message: 'Forbidden: Private images are restricted to the report finder.' });
       return;
     }
@@ -255,7 +256,7 @@ export const deleteLostItemImage = async (req: Request, res: Response, next: Nex
       return;
     }
 
-    if (lostItem.userId !== userId) {
+    if (!canAccessPrivateItemImages(userId, lostItem.userId, req.user!.role)) {
       res.status(403).json({ success: false, message: 'Forbidden: You are not authorized to delete images from this report.' });
       return;
     }
@@ -303,7 +304,7 @@ export const deleteFoundItemImage = async (req: Request, res: Response, next: Ne
       return;
     }
 
-    if (foundItem.finderId !== userId) {
+    if (!canAccessPrivateItemImages(userId, foundItem.finderId, req.user!.role)) {
       res.status(403).json({ success: false, message: 'Forbidden: You are not authorized to delete images from this report.' });
       return;
     }
