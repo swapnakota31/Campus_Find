@@ -4,6 +4,7 @@ import authRoutes from './auth.routes';
 import lostItemRoutes from './lostItem.routes';
 import foundItemRoutes from './foundItem.routes';
 import imageRoutes from './image.routes';
+import { adminRouter, claimsRouter, questionRouter } from './claim.routes';
 
 const router = Router();
 
@@ -42,6 +43,13 @@ router.use('/v1/items/lost', lostItemRoutes);
 
 router.use('/items/found', foundItemRoutes);
 router.use('/v1/items/found', foundItemRoutes);
+
+router.use('/claims', claimsRouter);
+router.use('/v1/claims', claimsRouter);
+router.use('/found-items', questionRouter);
+router.use('/v1/found-items', questionRouter);
+router.use('/admin/claims', adminRouter);
+router.use('/v1/admin/claims', adminRouter);
 
 export default router;
 
