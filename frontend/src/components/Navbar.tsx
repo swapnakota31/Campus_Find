@@ -63,6 +63,11 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <div className="flex items-center gap-3">
+                  {user.role === 'ADMIN' && (
+                    <Link href="/admin/matches" className="px-3 py-1.5 text-xs font-semibold text-amber-300 hover:text-amber-200 hover:bg-amber-500/10 rounded-lg transition-colors">
+                      Match Review
+                    </Link>
+                  )}
                 <div className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-slate-300 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400" />
                   <span className="truncate max-w-[180px]">{user.collegeEmail}</span>
@@ -131,6 +136,15 @@ export function Navbar() {
           
           {user && (
             <div className="pt-3 border-t border-slate-800 space-y-2">
+              {user.role === 'ADMIN' && (
+                <Link
+                  href="/admin/matches"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-2 text-sm font-semibold text-amber-300 hover:bg-amber-500/10 rounded-lg"
+                >
+                  Match Review
+                </Link>
+              )}
               <div className="px-3 py-2 text-xs font-mono text-slate-400 bg-slate-950 rounded-lg">
                 <span className="block text-[10px] uppercase text-slate-500 font-semibold mb-0.5">Signed in as</span>
                 <span className="text-slate-200 font-medium break-all">{user.collegeEmail}</span>

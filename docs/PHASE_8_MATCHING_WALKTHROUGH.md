@@ -29,7 +29,7 @@ The matching service never returns image URLs or image bytes. Cloudinary access 
 
 ## Limitations
 
-The current provider is explicitly a development stub, not real computer vision. A production rollout needs a vetted vision or embedding provider, provider-specific credentials/configuration, calibration, monitoring, and an asynchronous queue. Admin match-review UI and handover remain later phases.
+The current provider is explicitly a development stub, not real computer vision. A production rollout needs a vetted vision or embedding provider, provider-specific credentials/configuration, calibration, monitoring, and an asynchronous queue. Handover remains a later phase; admin match review is implemented in Phase 9.
 
 ## Validation
 

@@ -111,6 +111,34 @@ export interface FoundItem {
   images?: ItemImage[];
 }
 
+export type MatchStatus = 'POTENTIAL' | 'REVIEWED' | 'CONFIRMED' | 'DISMISSED';
+
+export interface AdminMatch {
+  id: string;
+  lostItemId: string;
+  foundItemId: string;
+  textScore: number | null;
+  imageScore: number | null;
+  metadataScore: number | null;
+  overallScore: number | null;
+  status: MatchStatus;
+  createdAt: string;
+  updatedAt: string;
+  lostItem: LostItem;
+  foundItem: FoundItem;
+}
+
+export interface AdminMatchImage {
+  id: string;
+  signedAccessUrl: string;
+  createdAt: string;
+}
+
+export interface AdminMatchDetail extends Omit<AdminMatch, 'lostItem' | 'foundItem'> {
+  lostItem: LostItem & { images: AdminMatchImage[] };
+  foundItem: FoundItem & { images: AdminMatchImage[] };
+}
+
 export interface GetItemsQuery {
   category?: string;
   status?: string;
@@ -321,5 +349,22 @@ export const api = {
 
   deleteFoundImage: async (id: string, imageId: string): Promise<{ success: boolean; message: string }> => {
     return api.delete(`/items/found/${id}/images/${imageId}`);
+  },
+
+  // Admin Match Review Endpoints
+  getAdminMatches: async (): Promise<{ status: string; data: AdminMatch[] }> => {
+    return api.get('/admin/matches');
+  },
+
+  getAdminMatch: async (id: string): Promise<{ status: string; data: AdminMatchDetail }> => {
+    return api.get(`/admin/matches/${id}`);
+  },
+
+  approveAdminMatch: async (id: string, reason?: string): Promise<{ status: string; data: AdminMatch }> => {
+    return api.post(`/admin/matches/${id}/approve`, reason ? { reason } : {});
+  },
+
+  rejectAdminMatch: async (id: string, reason: string): Promise<{ status: string; data: AdminMatch }> => {
+    return api.post(`/admin/matches/${id}/reject`, { reason });
   },
 };
