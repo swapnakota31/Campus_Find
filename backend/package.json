@@ -13,7 +13,8 @@
     "test:items": "ts-node src/scripts/test-items.ts",
     "test:images": "ts-node src/scripts/test-images.ts",
     "test:verification-security": "ts-node src/scripts/test-verification-security.ts",
-    "test:claims": "ts-node src/scripts/test-claims.ts"
+    "test:claims": "ts-node src/scripts/test-claims.ts",
+    "test:matching": "ts-node src/scripts/test-matching.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",

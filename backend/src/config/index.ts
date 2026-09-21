@@ -31,6 +31,9 @@ export const config = {
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
   maxImagesPerItem: parseInt(process.env.MAX_IMAGES_PER_ITEM || '5', 10),
   maxImageSizeBytes: parseInt(process.env.MAX_IMAGE_SIZE_BYTES || '5242880', 10), // 5 MB
+  imageMatchingProvider: process.env.AI_IMAGE_PROVIDER || 'development-mock',
+  maxImageComparisons: parseInt(process.env.AI_MAX_IMAGE_COMPARISONS || '25', 10),
+  matchingThreshold: parseFloat(process.env.MATCHING_THRESHOLD || '0.45'),
 };
 
 // Simple configuration sanity check

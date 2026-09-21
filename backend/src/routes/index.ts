@@ -5,6 +5,7 @@ import lostItemRoutes from './lostItem.routes';
 import foundItemRoutes from './foundItem.routes';
 import imageRoutes from './image.routes';
 import { adminRouter, claimsRouter, questionRouter } from './claim.routes';
+import matchingRoutes from './matching.routes';
 
 const router = Router();
 
@@ -50,6 +51,8 @@ router.use('/found-items', questionRouter);
 router.use('/v1/found-items', questionRouter);
 router.use('/admin/claims', adminRouter);
 router.use('/v1/admin/claims', adminRouter);
+router.use('/matching', matchingRoutes);
+router.use('/v1/matching', matchingRoutes);
 
 export default router;
 

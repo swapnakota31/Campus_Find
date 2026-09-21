@@ -126,7 +126,7 @@ export class ImageService {
    */
   async getSecureBufferForAI(publicId: string): Promise<Buffer> {
     if (!this.isConfigured) {
-      return Buffer.from('MOCK_AI_IMAGE_BINARY_DATA');
+      return Buffer.from(`MOCK_AI_IMAGE_BINARY_DATA:${publicId}`);
     }
 
     const signedUrl = this.generateSignedAccessUrl(publicId, 300);
