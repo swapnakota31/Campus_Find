@@ -16,9 +16,10 @@
     "test:claims": "ts-node src/scripts/test-claims.ts",
     "test:matching": "ts-node src/scripts/test-matching.ts",
     "test:admin-matches": "ts-node src/scripts/test-admin-matches.ts",
-    "test:handover": "ts-node src/scripts/test-handover.ts"
-    ,"test:student-workflow": "ts-node src/scripts/test-student-workflow.ts",
-    "test:participant-handover": "ts-node src/scripts/test-participant-handover.ts"
+    "test:handover": "ts-node src/scripts/test-handover.ts",
+    "test:student-workflow": "ts-node src/scripts/test-student-workflow.ts",
+    "test:participant-handover": "ts-node src/scripts/test-participant-handover.ts",
+    "test:production-readiness": "ts-node src/scripts/test-production-readiness.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",
@@ -27,6 +28,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.4.0",
     "nodemailer": "^10.0.10"

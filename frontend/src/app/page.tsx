@@ -9,6 +9,21 @@ import { LoadingState } from '@/components/LoadingState';
 import { ErrorState } from '@/components/ErrorState';
 import { api, LostItem, FoundItem } from '@/services/api';
 
+const campusLocations = [
+  'Main Block',
+  'N Block',
+  'P Block',
+  'Canteen',
+  'Library',
+  'Shed A',
+  'Shed B',
+  'Shed C',
+  'Shed D',
+  'A2 Seminar Hall',
+  'A4 Seminar Hall',
+  'Amenities Block',
+];
+
 export default function StudentDashboard() {
   const [recentLost, setRecentLost] = useState<LostItem[]>([]);
   const [recentFound, setRecentFound] = useState<FoundItem[]>([]);
@@ -48,51 +63,69 @@ export default function StudentDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans">
+    <div className="min-h-screen flex flex-col bg-[var(--campus-bg)] text-[var(--campus-text)]">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-blue-950/40 border border-slate-800 p-8 sm:p-12 text-center space-y-6 shadow-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold">
-            🎓 Campus Lost & Found Hub
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-10 px-4 py-8 sm:px-6 lg:px-8">
+        <section className="campus-banner overflow-hidden rounded-[28px] border border-white/10 p-8 text-white shadow-[var(--campus-shadow)] sm:p-10 lg:p-12">
+          <div className="max-w-3xl">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-blue-100">
+              Campus Lost & Found Portal
+            </div>
+
+            <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl">
+              Lost something on campus?
+              <span className="mt-2 block text-[var(--campus-yellow)]">Found something that belongs to someone?</span>
+            </h1>
+
+            <p className="mt-4 max-w-xl text-sm leading-7 text-blue-100 sm:text-base">
+              CampusFind helps students report missing items, identify found belongings, and securely coordinate returns across campus.
+            </p>
+
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link href="/lost/report" className="campus-button-primary px-6 py-3.5 text-sm">
+                Report Lost Item
+              </Link>
+              <Link href="/found/report" className="campus-button-secondary px-6 py-3.5 text-sm">
+                Report Found Item
+              </Link>
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight max-w-3xl mx-auto leading-tight">
-            Lost something? Found something?
-            <span className="block text-blue-400 mt-2">Let&apos;s help it get back to its owner.</span>
-          </h1>
+          <div className="mt-8 grid max-w-lg grid-cols-2 gap-4 rounded-2xl border border-white/10 bg-[rgba(15,31,57,0.18)] p-4 backdrop-blur-sm">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
+              <div className="text-3xl font-black text-[var(--campus-yellow)]">{lostTotal}</div>
+              <div className="mt-1 text-xs text-blue-100">Lost reports</div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
+              <div className="text-3xl font-black text-[var(--campus-yellow)]">{foundTotal}</div>
+              <div className="mt-1 text-xs text-blue-100">Found reports</div>
+            </div>
+          </div>
+        </section>
 
-          <p className="text-slate-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-            CampusFind is the secure, privacy-first platform connecting students who lost belongings with finders across campus.
-          </p>
-
-          {/* Prominent Actions */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <Link
-              href="/lost/report"
-              className="w-full sm:w-auto px-6 py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-rose-600/20 transition-all transform hover:-translate-y-0.5"
-            >
-              🔍 Report Lost Item
-            </Link>
-            <Link
-              href="/found/report"
-              className="w-full sm:w-auto px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-emerald-600/20 transition-all transform hover:-translate-y-0.5"
-            >
-              📦 Report Found Item
-            </Link>
+        <section className="space-y-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--campus-royal)]">Campus Locations</p>
+              <h2 className="mt-2 text-2xl font-black text-[var(--campus-text)]">Popular campus touchpoints</h2>
+            </div>
           </div>
 
-          {/* Quick Statistics Overview */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 max-w-md mx-auto gap-4 pt-6 border-t border-slate-800/80">
-            <div className="bg-slate-950/60 p-3.5 rounded-xl border border-slate-850">
-              <span className="text-2xl font-bold text-rose-400 block">{lostTotal}</span>
-              <span className="text-xs text-slate-400 font-medium">Active Lost Reports</span>
-            </div>
-            <div className="bg-slate-950/60 p-3.5 rounded-xl border border-slate-850">
-              <span className="text-2xl font-bold text-emerald-400 block">{foundTotal}</span>
-              <span className="text-xs text-slate-400 font-medium">Active Found Reports</span>
-            </div>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {campusLocations.map((location) => (
+              <div key={location} className="campus-card group p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--campus-light)] text-lg text-[var(--campus-royal)]">📍</div>
+                    <p className="text-base font-bold text-[var(--campus-text)]">{location}</p>
+                  </div>
+                  <span className="rounded-full bg-[var(--campus-light)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--campus-royal)]">
+                    Campus
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -102,35 +135,21 @@ export default function StudentDashboard() {
           <ErrorState message={error} onRetry={loadDashboardData} />
         ) : (
           <div className="space-y-12">
-            {/* Recent Lost Items Section */}
             <section className="space-y-5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                    <span>Recent Lost Reports</span>
-                  </h2>
-                  <p className="text-xs text-slate-400">Belongings recently reported missing by students</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--campus-royal)]">Recent reports</p>
+                  <h2 className="mt-2 text-2xl font-black text-[var(--campus-text)]">Recent lost items</h2>
                 </div>
-                <Link
-                  href="/lost"
-                  className="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
-                >
-                  <span>View All Lost Items ({lostTotal})</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                <Link href="/lost" className="text-sm font-semibold text-[var(--campus-royal)] hover:text-[var(--campus-navy)]">
+                  View all ({lostTotal})
                 </Link>
               </div>
 
               {recentLost.length === 0 ? (
-                <EmptyState
-                  title="No lost items reported yet"
-                  description="Great news! There are currently no active lost item reports on campus."
-                  actionLabel="Report a Lost Item"
-                  actionHref="/lost/report"
-                />
+                <EmptyState title="No lost items reported yet" description="Great news! There are currently no active lost item reports on campus." actionLabel="Report a Lost Item" actionHref="/lost/report" />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
                   {recentLost.map((item) => (
                     <ItemCard key={item.id} item={item} type="lost" />
                   ))}
@@ -138,35 +157,21 @@ export default function StudentDashboard() {
               )}
             </section>
 
-            {/* Recent Found Items Section */}
             <section className="space-y-5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                    <span>Recent Found Reports</span>
-                  </h2>
-                  <p className="text-xs text-slate-400">Items turned in or spotted around campus</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--campus-royal)]">Recent reports</p>
+                  <h2 className="mt-2 text-2xl font-black text-[var(--campus-text)]">Recent found items</h2>
                 </div>
-                <Link
-                  href="/found"
-                  className="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
-                >
-                  <span>View All Found Items ({foundTotal})</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                <Link href="/found" className="text-sm font-semibold text-[var(--campus-royal)] hover:text-[var(--campus-navy)]">
+                  View all ({foundTotal})
                 </Link>
               </div>
 
               {recentFound.length === 0 ? (
-                <EmptyState
-                  title="No found items reported yet"
-                  description="Found an item on campus? Report it to help return it to its owner."
-                  actionLabel="Report a Found Item"
-                  actionHref="/found/report"
-                />
+                <EmptyState title="No found items reported yet" description="Found an item on campus? Report it to help return it to its owner." actionLabel="Report a Found Item" actionHref="/found/report" />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
                   {recentFound.map((item) => (
                     <ItemCard key={item.id} item={item} type="found" />
                   ))}
@@ -177,8 +182,8 @@ export default function StudentDashboard() {
         )}
       </main>
 
-      <footer className="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
-        CampusFind — Secure & Privacy-First Student Lost & Found Platform
+      <footer className="border-t border-[var(--campus-border)] bg-white/60 py-6 text-center text-xs text-[var(--campus-muted)]">
+        CampusFind — Secure & privacy-first student lost & found platform
       </footer>
     </div>
   );

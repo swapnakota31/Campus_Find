@@ -73,59 +73,40 @@ export function ImageUploader({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-          Upload Photos <span className="text-slate-500 font-normal">({selectedFiles.length}/{maxFiles})</span>
+      <div className="flex items-center justify-between gap-3">
+        <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--campus-muted)]">
+          Upload Photos <span className="font-normal text-[var(--campus-text)]">({selectedFiles.length}/{maxFiles})</span>
         </label>
-        <span className="text-[11px] text-slate-500">Max {maxSizeMB}MB each (JPEG, PNG, WebP)</span>
+        <span className="text-[11px] text-[var(--campus-muted)]">Max {maxSizeMB}MB each</span>
       </div>
 
       {error && (
-        <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-lg">
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700">
           {error}
         </div>
       )}
 
-      {/* File Input Selector */}
       {selectedFiles.length < maxFiles && (
-        <label className="border-2 border-dashed border-slate-800 hover:border-blue-500/50 bg-slate-950/60 hover:bg-slate-900/60 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all group">
-          <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 text-slate-400 group-hover:text-blue-400 flex items-center justify-center text-lg mb-2">
+        <label className="group flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[var(--campus-border)] bg-[var(--campus-light)] p-4 transition-all hover:border-[var(--campus-royal)]">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--campus-border)] bg-white text-lg text-[var(--campus-royal)]">
             📷
           </div>
-          <p className="text-xs font-semibold text-slate-300 group-hover:text-blue-400 transition-colors">
+          <p className="text-xs font-semibold text-[var(--campus-text)] group-hover:text-[var(--campus-royal)]">
             Click to select or drag and drop images
           </p>
-          <p className="text-[11px] text-slate-500 mt-0.5">Up to {maxFiles} private images</p>
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-            onChange={handleFileSelect}
-            className="hidden"
-          />
+          <p className="mt-0.5 text-[11px] text-[var(--campus-muted)]">Up to {maxFiles} private images</p>
+          <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleFileSelect} className="hidden" />
         </label>
       )}
 
-      {/* Thumbnail Previews Grid */}
       {previews.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-2">
+        <div className="grid grid-cols-2 gap-3 pt-2 sm:grid-cols-3 md:grid-cols-5">
           {previews.map((item, index) => (
-            <div key={item.id} className="relative group rounded-xl overflow-hidden border border-slate-800 bg-slate-900 aspect-square">
-              {/* Thumbnail Image */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.url}
-                alt={item.name}
-                className="w-full h-full object-cover"
-              />
-              {/* Overlay with Remove Button */}
-              <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2 text-center">
-                <span className="text-[10px] text-slate-300 truncate w-full mb-1">{item.name}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemove(index)}
-                  className="px-2 py-1 bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold rounded-lg transition-all shadow-md"
-                >
+            <div key={item.id} className="group relative aspect-square overflow-hidden rounded-xl border border-[var(--campus-border)] bg-[var(--campus-light)]">
+              <img src={item.url} alt={item.name} className="h-full w-full object-cover" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[rgba(11,45,85,0.72)] p-2 text-center opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="mb-1 w-full truncate text-[10px] text-white">{item.name}</span>
+                <button type="button" onClick={() => handleRemove(index)} className="rounded-lg bg-rose-600 px-2 py-1 text-[11px] font-bold text-white">
                   Remove
                 </button>
               </div>

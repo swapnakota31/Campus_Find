@@ -4,11 +4,16 @@ import cookieParser from 'cookie-parser';
 import { config } from './config';
 import apiRouter from './routes';
 import { errorHandler } from './middleware/error.middleware';
+import { authRateLimiter, generalRateLimiter, requestSanitizer, securityHeaders } from './middleware/security.middleware';
 import { AppError } from './utils/errors';
+import { cleanupExpiredOTPs } from './utils/maintenance';
 
 const app = express();
 
 // Security foundation middleware setup
+app.use(securityHeaders);
+app.use(generalRateLimiter);
+app.use(requestSanitizer);
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -30,6 +35,8 @@ app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+app.use('/api/auth', authRateLimiter);
+app.use('/api/v1/auth', authRateLimiter);
 
 // Routing binding
 app.use('/api', apiRouter);
@@ -41,6 +48,16 @@ app.use('*', (req, res, next) => {
 
 // Centralized error boundary middleware
 app.use(errorHandler);
+
+void cleanupExpiredOTPs().catch((error) => {
+  console.error('Failed to cleanup expired OTP records on startup:', error);
+});
+
+setInterval(() => {
+  void cleanupExpiredOTPs().catch((error) => {
+    console.error('Failed to cleanup expired OTP records during maintenance window:', error);
+  });
+}, 10 * 60 * 1000);
 
 // Server startup execution
 const server = app.listen(config.port, () => {

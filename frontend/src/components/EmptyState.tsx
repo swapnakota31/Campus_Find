@@ -15,20 +15,17 @@ export function EmptyState({
   actionHref,
 }: EmptyStateProps) {
   return (
-    <div className="border border-dashed border-slate-800 rounded-2xl p-12 text-center space-y-4 my-6 bg-slate-900/40">
-      <div className="w-16 h-16 bg-slate-800/60 text-slate-500 rounded-full flex items-center justify-center mx-auto text-2xl">
+    <div className="campus-card my-6 space-y-4 p-12 text-center">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--campus-light)] text-2xl text-[var(--campus-navy)]">
         🔍
       </div>
       <div className="space-y-1">
-        <h3 className="text-lg font-bold text-slate-200">{title}</h3>
-        <p className="text-sm text-slate-400 max-w-sm mx-auto">{description}</p>
+        <h3 className="text-lg font-bold text-[var(--campus-text)]">{title}</h3>
+        <p className="mx-auto max-w-sm text-sm text-[var(--campus-muted)]">{description}</p>
       </div>
       {actionLabel && actionHref && (
         <div className="pt-2">
-          <Link
-            href={actionHref}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-blue-600/20"
-          >
+          <Link href={actionHref} className="campus-button-primary px-4 py-2.5 text-xs">
             {actionLabel}
           </Link>
         </div>

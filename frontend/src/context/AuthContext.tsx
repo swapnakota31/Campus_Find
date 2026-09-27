@@ -44,19 +44,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let isMounted = true;
+
     (async () => {
       setLoading(true);
       const currentUser = await refreshUser();
-      if (isMounted) {
-        setLoading(false);
-        const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
-        if (!currentUser && !isPublicRoute) {
-          router.replace('/login');
-        } else if (currentUser && pathname === '/login') {
-          router.replace('/');
-        }
+
+      if (!isMounted) return;
+
+      setLoading(false);
+
+      const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+
+      if (!currentUser && !isPublicRoute) {
+        router.replace('/login');
+        return;
+      }
+
+      if (currentUser && isPublicRoute) {
+        router.replace(currentUser.role === 'ADMIN' ? '/admin/matches' : '/');
       }
     })();
+
     return () => {
       isMounted = false;
     };

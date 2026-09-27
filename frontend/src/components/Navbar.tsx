@@ -24,85 +24,73 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          
-          {/* Brand Logo & Title */}
+    <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[var(--campus-deep)] text-white backdrop-blur-md">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-sm font-black text-[var(--campus-yellow)] shadow-lg shadow-[rgba(244,196,0,0.18)] transition-transform group-hover:scale-105">
                 CF
               </div>
-              <span className="text-xl font-extrabold text-white tracking-tight group-hover:text-blue-400 transition-colors">
-                Campus<span className="text-blue-500">Find</span>
-              </span>
+              <div className="leading-none">
+                <div className="text-lg font-black tracking-tight text-white">
+                  Campus<span className="text-[var(--campus-yellow)]">Find</span>
+                </div>
+              </div>
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden items-center gap-1 md:flex">
             {navLinks.map((link) => {
               const active = isActive(link.href);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    active
-                      ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  className={`relative rounded-xl px-4 py-2 text-sm font-medium transition-all ${
+                    active ? 'bg-white/10 text-white' : 'text-blue-100 hover:bg-white/5 hover:text-white'
                   }`}
                 >
+                  {active && <span className="absolute inset-x-2 -bottom-1 h-0.5 rounded-full bg-[var(--campus-yellow)]" />}
                   {link.label}
                 </Link>
               );
             })}
           </nav>
 
-          {/* User Profile & Actions */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden items-center gap-4 md:flex">
             {user ? (
               <div className="flex items-center gap-3">
-                  {user.role === 'ADMIN' && (
-                    <Link href="/admin/matches" className="px-3 py-1.5 text-xs font-semibold text-amber-300 hover:text-amber-200 hover:bg-amber-500/10 rounded-lg transition-colors">
-                      Match Review
-                    </Link>
-                  )}
-                <div className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-slate-300 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                  <span className="truncate max-w-[180px]">{user.collegeEmail}</span>
-                  {user.role === 'ADMIN' && (
-                    <span className="px-1.5 py-0.2 bg-amber-500/20 text-amber-300 text-[10px] font-semibold rounded">
-                      ADMIN
-                    </span>
-                  )}
+                {user.role === 'ADMIN' && (
+                  <Link href="/admin/matches" className="rounded-lg border border-[rgba(244,196,0,0.35)] bg-[rgba(244,196,0,0.08)] px-3 py-1.5 text-xs font-semibold text-[var(--campus-yellow)] transition-colors hover:bg-[rgba(244,196,0,0.14)]">
+                    Match Review
+                  </Link>
+                )}
+                <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-blue-100">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                  <span className="max-w-[180px] truncate">{user.collegeEmail}</span>
                 </div>
                 <button
                   onClick={logout}
-                  className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 rounded-lg transition-all"
+                  className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-blue-100 transition-colors hover:border-rose-300/50 hover:bg-rose-500/10 hover:text-rose-200"
                 >
                   Logout
                 </button>
               </div>
             ) : (
-              <Link
-                href="/login"
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm rounded-lg shadow-md transition-all"
-              >
+              <Link href="/login" className="campus-button-primary px-4 py-2.5 text-sm">
                 Sign In
               </Link>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="flex md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg focus:outline-none"
-              aria-label="Toggle Navigation Menu"
+              className="rounded-lg p-2 text-blue-100 hover:bg-white/5"
+              aria-label="Toggle navigation"
             >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {mobileMenuOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
@@ -114,9 +102,8 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-800 bg-slate-900 px-4 pt-2 pb-4 space-y-2">
+        <div className="border-t border-white/10 bg-[var(--campus-deep)] px-4 pb-4 pt-3 md:hidden">
           {navLinks.map((link) => {
             const active = isActive(link.href);
             return (
@@ -124,39 +111,23 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`block px-3 py-2 rounded-lg text-base font-medium ${
-                  active
-                    ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20'
-                    : 'text-slate-300 hover:bg-slate-800'
+                className={`block rounded-xl px-3 py-2 text-base font-medium ${
+                  active ? 'bg-white/10 text-white' : 'text-blue-100 hover:bg-white/5'
                 }`}
               >
                 {link.label}
               </Link>
             );
           })}
-          
+
           {user && (
-            <div className="pt-3 border-t border-slate-800 space-y-2">
+            <div className="mt-3 space-y-2 border-t border-white/10 pt-3">
               {user.role === 'ADMIN' && (
-                <Link
-                  href="/admin/matches"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 text-sm font-semibold text-amber-300 hover:bg-amber-500/10 rounded-lg"
-                >
+                <Link href="/admin/matches" onClick={() => setMobileMenuOpen(false)} className="block rounded-lg border border-[rgba(244,196,0,0.35)] bg-[rgba(244,196,0,0.08)] px-3 py-2 text-sm font-semibold text-[var(--campus-yellow)]">
                   Match Review
                 </Link>
               )}
-              <div className="px-3 py-2 text-xs font-mono text-slate-400 bg-slate-950 rounded-lg">
-                <span className="block text-[10px] uppercase text-slate-500 font-semibold mb-0.5">Signed in as</span>
-                <span className="text-slate-200 font-medium break-all">{user.collegeEmail}</span>
-              </div>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  logout();
-                }}
-                className="w-full text-left px-3 py-2 text-sm font-medium text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
-              >
+              <button onClick={() => { setMobileMenuOpen(false); logout(); }} className="w-full rounded-lg border border-white/10 px-3 py-2 text-left text-sm text-blue-100">
                 Logout
               </button>
             </div>
